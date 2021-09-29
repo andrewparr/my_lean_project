@@ -52,15 +52,14 @@ end
 
 lemma one_of_consecutive_is_even : is_even x ∨ is_even (x + 1) :=
 begin
-    
-
+  refine or_of_or_of_imp_of_imp _ _ _,
 end
 
 example : is_even (x^2 - x) :=
 begin
   rw pow_two,
   --rw ← mul_one x, -- this does all instances of x but I only want the right hand one
-  -- conv_rhs rw ← mul_one x,
+  -- conv_rhs {rw ← mul_one x},
   ring_nf,
   split,
   {sorry,},
