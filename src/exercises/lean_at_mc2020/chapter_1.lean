@@ -242,15 +242,25 @@ end
 
 theorem contrapositive_converse' (P Q : Prop) : (¬Q → ¬P) → (P → Q) :=
 begin
-  sorry,
+  intro hnQnP,
+  -- goal is now P → Q, so use contrapose! following hints above
+  contrapose,
+  exact hnQnP, -- and we are left with hnQnP
 end
 
 example (P : Prop) : ¬ P → ¬ ¬ ¬ P :=
 begin
-  sorry,
+  push_neg,
+  exact tautology' _, -- goal was ¬ P → ¬ P, so use earlier proof of P → P.
 end
 
 theorem principle_of_explosion (P Q : Prop) : P → (¬ P → Q) :=
 begin
-  sorry,
+  intro hP,   -- gives hP : P
+  intro hnP,  -- gives hnP : ¬ P
+  exfalso,    -- changes goal of Q to false
+  apply hnP,  -- recall ¬ P is P → false and so this makes goal P
+  exact hP,
 end
+
+
