@@ -167,3 +167,90 @@ begin
 end
 
 -- 1.3. Proof by contradiction
+
+/--------------------------------------------------------------------------
+
+You can prove exactly one of the following three using just
+``exact``, ``intro``, ``have``, and ``apply``.
+
+Can you find which one?
+
+--------------------------------------------------------------------------/
+
+theorem not_not_self_imp_self (P : Prop) : ¬ ¬ P → P:=
+begin
+  sorry,
+end
+
+theorem contrapositive_converse (P Q : Prop) : (¬Q → ¬P) → (P → Q) :=
+begin
+  sorry,
+end
+
+example (P : Prop) : ¬ P → ¬ ¬ ¬ P :=
+begin
+  intro hP,
+  intro hnnP,
+  apply hnnP,
+  exact hP,
+end
+
+/--
+  This is because it is not true that ¬ ¬ P = P by definition, after all,
+     ¬ ¬ P is (P → false) → false
+  which is drastically different from P.
+  There is an extra axiom called the law of excluded middle which says that either P is inhabited
+  or ¬ P is inhabited (and there is no middle option) and so P ↔ ¬ ¬ P.
+  This is the axiom that allows for proofs by contradiction.
+  Lean provides us the following tactics to use it.
+--/
+
+/--------------------------------------------------------------------------
+
+``exfalso``
+
+  Changes the target of the current goal to ``false``.
+
+``push_neg``
+
+  ``push_neg,`` simplifies negations in the target.
+  You can push negations across a hypothesis ``hp : P`` using
+  ``push_neg at hp,``.
+
+
+``contrapose!``
+
+  If the target of the current goal is  ``P → Q``,
+  then ``contrapose!,`` changes the target to  ``¬ Q → ¬ P``.
+
+  If the target of the current goal is ``Q`` and
+  one of the hypotheses is ``hp : P``, then
+  ``contrapose! hp,`` changes the target to  ``¬ P`` and
+  changes the hypothesis to ``hp : ¬ Q``.
+
+
+Delete the ``sorry,`` below and replace them with a legitimate proof.
+
+--------------------------------------------------------------------------/
+
+theorem not_not_self_imp_self' (P : Prop) : ¬ ¬ P → P:=
+begin
+  push_neg,
+  intro hP,
+  exact hP,
+end
+
+theorem contrapositive_converse' (P Q : Prop) : (¬Q → ¬P) → (P → Q) :=
+begin
+  sorry,
+end
+
+example (P : Prop) : ¬ P → ¬ ¬ ¬ P :=
+begin
+  sorry,
+end
+
+theorem principle_of_explosion (P Q : Prop) : P → (¬ P → Q) :=
+begin
+  sorry,
+end
