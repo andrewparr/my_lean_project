@@ -280,3 +280,82 @@ begin
     show false, from h (p2 h),
   }
 end
+
+-- 2.3.2. Mathcampers singing paradox
+
+-- Assume that the main lounge is non-empty. At a fixed moment in time,
+-- there is someone in the lounge such that, if they are singing, then
+-- everyone in the lounge is singing.
+
+-- Note: This paradox is a rewording of the Drinker paradox.
+-- See https://en.wikipedia.org/wiki/Drinker_paradox
+-- "There is someone in the pub such that, if he is drinking, then everyone in the pub is drinking."
+
+-- The outline of the proof from wikipedia.
+-- The proof begins by recognizing it is true that either:
+--  [1] everyone in the pub is drinking, or
+--  [2] at least one person in the pub is not drinking.
+-- Consequently, there are two cases to consider:
+-- [1] Suppose everyone is drinking.
+--     For any particular person, it cannot be wrong to say that if that particular person is drinking,
+--     then everyone in the pub is drinking—because everyone is drinking.
+--     Because everyone is drinking, then that one person must drink because when that person drinks everybody drinks
+--     everybody includes that person.
+-- [2] Otherwise at least one person is not drinking.
+--     For any nondrinking person, the statement if that particular person is drinking,
+--     then everyone in the pub is drinking is formally true:
+--     its antecedent ("that particular person is drinking") is false, therefore the statement is true due to the
+--     nature of material implication in formal logic, which states that
+--     "If P, then Q" is always true if P is false.
+
+/--------------------------------------------------------------------------
+
+``by_cases``
+
+  If ``P`` is a proposition, then ``by_cases P,`` creates two goals,
+    the first with a hypothesis ``hp: P`` and
+    second with a hypothesis ``hp: ¬ P``.
+
+Delete the ``sorry,`` below and replace them with a legitimate proof.
+
+--------------------------------------------------------------------------/
+
+-- camper is a type.
+-- If x : camper then x is a camper in the main lounge.
+-- singing(x) is inhabited if x is singing
+
+theorem math_campers_singing_paradox
+  (camper : Type)
+  (singing : camper → Prop)
+  (alice : camper) -- making sure that there is at least one camper in the lounge
+  : ∃ x : camper, (singing x → (∀ y : camper, singing y)) :=
+begin
+  -- Following the proof structure above we first create two goals,
+  -- in which either everyone sings, or someone is not singing
+  by_cases (∃ bob : camper, ¬ singing bob),
+  {
+    -- Here we have the case:
+    -- h: ∃ (bob : camper), ¬singing bob
+    -- So this is case [2] above, the one where not everyone is singing.
+    -- h says there exists a bob such that bob is not singing. The line
+    cases h with bob h_bob_not_singing,
+    -- gives us the hypotheiss that bob isn't singing
+    use bob, -- vacuously proving the goal.
+  },
+  {
+    -- Here we have the case where everyone sings, but it is written with a negative
+    -- h: ¬∃ (bob : camper), ¬singing bob
+    -- push_neg will sort this out
+    push_neg at h,
+    -- we now have
+    -- h: ∀ (bob : camper), singing bob
+    -- Our goal is a "there exists", we only know alice is in the lounge so lets use alice.
+    use alice,
+    -- goal is now singing alice → ∀ (y : camper), singing y
+    -- Which is an implication, so lets use intro.
+    intro h2, -- gives h2: singing alice
+    -- goal is now : camper), singing y
+    -- which is exactly h
+    exact h,
+  }
+end
