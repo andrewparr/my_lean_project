@@ -164,18 +164,119 @@ begin
   have x := barber,
   -- h is currently (x : men), shaves barber x ↔ ¬shaves x x
   -- so lets specialize to just get
-  -- h : h: shaves barber x ↔ ¬shaves x x
-  specialize h x,
+  -- h : h: shaves barber barber ↔ ¬shaves barber barber
+  specialize h barber,
   -- since h is a ↔ hypothesis, we do cases on it.
   cases h with p1 p2,
-  by_cases shaves barber barber,  
-  { 
+  by_cases shaves barber barber,
+  {
     -- goal here is false, and have h : shaves barber barber
-    
-    sorry,  
+    -- show false, from p1 h h, -- this is one line that will solve the goal
+    -- apply p1 h h, -- this line also on it's own solves the goal
+    apply p1 h,
+    exact h,
+    -- remember, goal was false and
+    -- ¬ shaves barber barber is the same as shaves barber barber → false
+    -- so applying p1: shaves barber barber → ¬shaves barber barber
+    -- gives shaves barber barber and this is exactly h
   },
   {
     -- goal here is false and have h : ¬ shaves barber barber
-    sorry,
+    -- show false, from h (p2 h), -- solves this is onle line
+    -- apply h (p2 h), -- this also solves the goal in one line
+    apply h,
+    apply p2,
+    exact h,
+    -- again goal was false, and h is
+    -- ¬shaves barber barber which is the same as shaves barber barber → false
+    -- so we can apply h on false to give goal of
+    -- shaves barber barber
+    -- now p2 is  ¬shaves barber barber → shaves barber barber
+    -- so after applying this, we get goal of ¬ shaves barber barber
+    -- and this is exactly h.
+
+  }
+end
+
+
+--- temp, the following are various proofs found on the internet that I used to help me to write the proof above.
+
+-- standalone
+-- See https://github.com/hyponymous/theorem-proving-in-lean-solutions/blob/a95320ae81c90c1b15da04574602cd378794400d/4.6.3.lean
+example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : false :=
+have hparadox : shaves barber barber ↔ ¬shaves barber barber, from
+    (h barber),
+have hn_self_shave : ¬shaves barber barber, from
+    (show shaves barber barber → false, from
+        assume h_self_shave : shaves barber barber,
+        absurd h_self_shave (hparadox.mp h_self_shave)),
+absurd (hparadox.mpr hn_self_shave) hn_self_shave
+
+
+example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : false :=
+begin
+  -- goal is false
+  have hparadox : shaves barber barber ↔ ¬shaves barber barber, from
+      (h barber),
+  -- now have hypothesis : shaves barber barber ↔ ¬shaves barber barber
+  have hn_self_shave : ¬shaves barber barber, from
+      (show shaves barber barber → false, from
+          assume h_self_shave : shaves barber barber,
+          absurd h_self_shave (hparadox.mp h_self_shave)),
+  -- now also have hypotheisis :  ¬shaves barber barber
+  -- this line comes from suggest, but what is it doing ?
+  exact (not_congr hparadox).mp hn_self_shave hn_self_shave,
+  --absurd (hparadox.mpr hn_self_shave) hn_self_shave
+end
+
+-- another proof from zulip chat
+variables (Man : Type) (tshaves : Man → Man → Prop)
+theorem NoSuchBarber ( h : ∃ x : Man,  ∀ y : Man, tshaves x y ↔ ¬ tshaves y y )
+: false :=
+    exists.elim h
+  ( assume barber,
+    begin
+        intro h,
+        have hbarbermpr : ¬tshaves barber barber → tshaves barber barber,
+            from iff.mpr (h barber),
+        have hbarbermp  : tshaves barber barber → ¬tshaves barber barber,
+            from iff.mp (h barber),
+        have nsbb : ¬tshaves barber barber, from
+            assume sbb : tshaves barber barber,
+            show false, from hbarbermp sbb sbb,
+        show false, from nsbb (hbarbermpr nsbb)
+    end
+)
+#print NoSuchBarber
+
+
+-- from Kevin Buzzard
+--variables (Man : Type) (shaves : Man → Man → Prop)
+theorem NoSuchBarber2 ( h : ∃ x : Man,  ∀ y : Man, tshaves x y ↔ ¬ tshaves y y )
+: false :=
+    exists.elim h
+  ( assume barber,
+    begin
+        intro h2, -- I don't want two hypotheses called h
+        have hbarber := h2 barber, -- human-generated good idea
+        tauto!, -- computer can finish it off
+    end
+)
+
+
+-- trying to rewrite this
+-- theorem NoSuchBarber ( h : ∃ x : Man,  ∀ y : Man, tshaves x y ↔ ¬ tshaves y y )
+example : ¬ (∀ x : men, shaves barber x ↔ ¬ shaves x x) :=
+begin
+  by_contradiction,
+  have x := barber,
+  specialize h barber,
+  cases h with p1 p2,
+  by_cases shaves barber barber,
+  {
+    show false, from p1 h h,
+  },
+  {
+    show false, from h (p2 h),
   }
 end
