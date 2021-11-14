@@ -359,3 +359,57 @@ begin
     exact h,
   }
 end
+
+-- 2.3.3. Relationship conundrum
+
+/--------------------------------------------------------------------------
+  A relation r on a type X is a map r : X → X → Prop. We say that x is related to y if r x y is inhabited.
+
+  r is reflexive if ∀ x : X, x is related to itself.
+  r is symmetric if ∀ x y : X, x is related to y implies y is related to x.
+  r is transitive if ∀ x y z : X, x is related to y and y is related to x implies z is related to z.
+  r is connected if for all x : X there is a y : Y such that x is related to y.
+---------------------------------------------------------------------------/
+
+-- Show that if a relation is symmetric, transitive, and connected, then it is also reflexive.
+
+variable X : Type
+
+theorem reflexive_of_symmetric_transitive_and_connected
+  (r : X → X → Prop)
+  (h_symm : ∀ x y : X, r x y → r y x)
+  (h_trans : ∀ x y z : X, r x y → r y z → r x z)
+  (h_connected : ∀ x, ∃ y, r x y)
+: (∀ x : X, r x x) :=
+begin
+  -- out goal is ∀ x : X, so lets introduce an arbitary x : X
+  intro x,
+  -- Either r x x is true, or it is false
+  by_cases (r x x), {
+    -- it's true, we are done as this is simpley h
+    exact h,
+  }, {
+    -- we now need to prove r x x when we know ¬ r x x, which we do by contradiction
+    by_contradiction,
+    -- from h_connected we know there exists a y such that r x y
+    -- by h_conneced is written as ∀ first, so we specialise on the x we have
+    specialize h_connected x,
+    -- we can now use cases on this to introduce the y : X such that we have h_rxy
+    cases h_connected with y h_rxy,
+    -- we now have h_rxy : r x y
+    -- we have also h_ryx y x := by applying h_symm,
+    have h_ryx : r y x := begin
+      apply h_symm,
+      assumption,
+    end,
+    -- and h_rxy and h_ryx and h_trans we have h_rxx
+    have h_rxx : r x x := begin
+      -- first specialize h_trans with the variables we want
+      specialize h_trans x y x,
+      -- our goal of r x x is now the result of applying this
+      exact h_trans h_rxy h_ryx,
+    end,
+    -- we now have h : ¬ r x x and h_rxx : r x x which is the contradtion we need to prove the goal of false.
+    show false, from h h_rxx,
+  }
+end
