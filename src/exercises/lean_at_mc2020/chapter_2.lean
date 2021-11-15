@@ -413,3 +413,135 @@ begin
     show false, from h h_rxx,
   }
 end
+
+-- note: a similar proof from the course notes solutions
+theorem reflexive_of_symmetric_and_transitive' (r : ℕ → ℕ → Prop)
+  (h_symm : symmetric r)
+  (h_trans : transitive r)
+  (h_connected : ∀ x, ∃ y, r x y) :
+  reflexive r :=
+begin
+  intro x,
+  have hxy := h_connected x,
+  cases hxy with y hy,
+  apply h_trans hy,
+  apply h_symm hy,
+end
+
+-- 2.4. Proving “trivial” statements
+
+/--
+   In mathlib, divisibility for natural numbers is defined as the following proposition.
+
+   a ∣ b := (∃ k : ℕ, a = b * k)
+
+  For example, 2 | 4 will be a proposition ∃ k : ℕ, 4 = 2 * k.
+  Very important. The statement 2 | 4 is not saying that “2 divides 4 is true”.
+  It is simply a proposition that requires a proof.
+
+  Similarly, the mathlib library also contains the following definition of prime.
+--/
+
+def nat.prime (p : ℕ) : Prop :=
+  2 ≤ p                                       -- p is at least 2
+  ∧                                           -- and
+  ∀ (m : ℕ), m ∣ p → m = 1 ∨ m = p            -- if m divides p, then m = 1 or m = p.
+
+/--------------------------------------------------------------------------
+
+  These tactics in Lean are useful for proving trivial proofs such as these.
+
+``norm_num``
+
+  Useful for arithmetic.
+
+``ring``
+
+  Useful for basic algebra.
+
+``linarith``
+
+  Useful for inequalities.
+
+``simp``
+
+  Complex simplifier. Use only to close goals.
+
+Delete the ``sorry,`` below and replace them with a legitimate proof.
+
+--------------------------------------------------------------------------/
+
+example : 1 > 0 :=
+begin
+  norm_num,
+end
+
+example (m a b : ℕ) :  m^2 + (a + b) * m + a * b = (m + a) * (m + b) :=
+begin
+  ring,
+end
+
+example : 101 ∣ 2020 :=
+begin
+  norm_num,
+end
+
+
+example : nat.prime 101 :=
+begin
+  -- remember nat.prime is defined as two propositions joined with an and
+  split, {
+    -- first goal is just to prove 2 ≤ 101.
+    norm_num,
+  }, {
+    -- second goal is prove that ∀ m | 101, either m = 1 ∨ m = 101
+    intro m, -- let m be the arbitary natural number,
+    intro h,
+    cases h with k,
+    -- either m = 1, or it isn't
+    by_cases h_m_ne_1 : m = 1,
+    {
+      -- if m = 1, this matches the lhs of our goal
+      left, assumption,
+    },
+    -- we now have ¬ m = 1,
+    -- either m = 101, or it does not.
+    by_cases h_m_ne_101 : m = 101,
+    {
+      -- for our goal m = 101, this is the rhs of our goal.
+      right, assumption,
+    },
+    -- we now know m ≠ 1 and m ≠ 101  but need to prve m = 1 ∨ m = 101
+    by_contradiction,
+    have hhh : (¬m = 1) ∧ (¬m = 101) := begin
+      split,
+      exact h_m_ne_1,
+      exact h_m_ne_101,
+    end,
+    rw not_or_distrib at h,
+    --apply not_and_of_not_or_not h,
+        --rw not_and_of_not_or_not h_m_ne_1 ∨ h_m_ne_101,
+
+    sorry,
+  }
+end
+
+-- you will need the definition
+-- a ∣ b := (∃ k : ℕ, a = b * k)
+example (m a b : ℕ) :  m + a ∣ m^2 + (a + b) * m + a * b :=
+begin
+  sorry,
+end
+
+-- try ``unfold nat.prime at hp,`` to get started
+example (p : ℕ) (hp : nat.prime p) : ¬ (p = 1) :=
+begin
+  sorry,
+end
+
+-- if none of the simplifiers work, try doing ``contrapose!``
+-- sometimes the simplifiers need a little help
+example (n : ℕ) : 0 < n ↔ n ≠ 0 :=
+begin
+  sorry,
+end

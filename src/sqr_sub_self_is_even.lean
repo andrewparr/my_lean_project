@@ -50,6 +50,21 @@ begin
   ring,
 end
 
+-- from mc2020 solutions we also have.
+lemma even_or_odd (n : ℕ) : (∃ k, n = 2 * k) ∨ ∃ k, n = 2 * k + 1 :=
+begin
+  induction n with d hd,
+  { use 0, simp },
+  -- you should ~always do this rw after opening the successor case of induction on the naturals
+  rw nat.succ_eq_add_one,
+  cases hd with h_even h_odd,
+  { cases h_even with k hk,
+    right, use k, rw hk },
+  cases h_odd with k hk,
+  left, use k+1, rw hk, ring,
+end
+
+
 lemma one_of_consecutive_is_even : is_even x ∨ is_even (x + 1) :=
 begin
   refine or_of_or_of_imp_of_imp _ _ _,
