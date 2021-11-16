@@ -1,7 +1,9 @@
 import tactic
+import data.nat.prime
 -- the next two lines let us use the by_cases tactic without trouble
-noncomputable theory
-open_locale classical
+-- noncomputable theory
+-- open_locale classical
+
 
 -- 2.1.2. Proofs as functions
 
@@ -440,12 +442,13 @@ end
   It is simply a proposition that requires a proof.
 
   Similarly, the mathlib library also contains the following definition of prime.
---/
 
 def nat.prime (p : ℕ) : Prop :=
   2 ≤ p                                       -- p is at least 2
   ∧                                           -- and
   ∀ (m : ℕ), m ∣ p → m = 1 ∨ m = p            -- if m divides p, then m = 1 or m = p.
+
+--/
 
 /--------------------------------------------------------------------------
 
@@ -486,45 +489,18 @@ begin
   norm_num,
 end
 
+example : nat.prime 3 :=
+begin
+  norm_num,
+end
 
 example : nat.prime 101 :=
 begin
-  -- remember nat.prime is defined as two propositions joined with an and
-  split, {
-    -- first goal is just to prove 2 ≤ 101.
-    norm_num,
-  }, {
-    -- second goal is prove that ∀ m | 101, either m = 1 ∨ m = 101
-    intro m, -- let m be the arbitary natural number,
-    intro h,
-    cases h with k,
-    -- either m = 1, or it isn't
-    by_cases h_m_ne_1 : m = 1,
-    {
-      -- if m = 1, this matches the lhs of our goal
-      left, assumption,
-    },
-    -- we now have ¬ m = 1,
-    -- either m = 101, or it does not.
-    by_cases h_m_ne_101 : m = 101,
-    {
-      -- for our goal m = 101, this is the rhs of our goal.
-      right, assumption,
-    },
-    -- we now know m ≠ 1 and m ≠ 101  but need to prve m = 1 ∨ m = 101
-    by_contradiction,
-    have hhh : (¬m = 1) ∧ (¬m = 101) := begin
-      split,
-      exact h_m_ne_1,
-      exact h_m_ne_101,
-    end,
-    rw not_or_distrib at h,
-    --apply not_and_of_not_or_not h,
-        --rw not_and_of_not_or_not h_m_ne_1 ∨ h_m_ne_101,
-
-    sorry,
-  }
-end
+  -- note you need to have
+  --    import data.nat.prime
+  -- for this one line proof to work.
+  norm_num,
+ end
 
 -- you will need the definition
 -- a ∣ b := (∃ k : ℕ, a = b * k)
