@@ -499,6 +499,7 @@ begin
   -- note you need to have
   --    import data.nat.prime
   -- for this one line proof to work.
+  -- I spent quite a bit of time trying to prove it without this line.
   norm_num,
  end
 
@@ -506,18 +507,53 @@ begin
 -- a ∣ b := (∃ k : ℕ, a = b * k)
 example (m a b : ℕ) :  m + a ∣ m^2 + (a + b) * m + a * b :=
 begin
-  sorry,
+  -- Our proof of this is to first observe that the rhs factorises
+  -- m^2 (a + b)m + ab = (m + a)(m + b)
+  -- from the definition of a | b we have a ∃ k, so in this case
+  -- our k is m + b
+  use m + b,
+  -- we are just left to prove that
+  -- m ^ 2 + (a + b) * m + a * b = (m + a) * (m + b)
+  ring, -- and now this is easily solved with ring!
 end
 
 -- try ``unfold nat.prime at hp,`` to get started
 example (p : ℕ) (hp : nat.prime p) : ¬ (p = 1) :=
 begin
-  sorry,
+  unfold nat.prime at hp,
+  -- after unfolding hp is
+  -- hp: 2 ≤ p ∧ ∀ (m : ℕ), m ∣ p → m = 1 ∨ m = p
+  -- this is two hypotheses via an and which we can split with
+  -- cases hp,
+  -- but in fact this isn't necessary as the linarith tatic clears the goal
+  linarith,
 end
 
 -- if none of the simplifiers work, try doing ``contrapose!``
 -- sometimes the simplifiers need a little help
 example (n : ℕ) : 0 < n ↔ n ≠ 0 :=
 begin
-  sorry,
+  -- Since we have ↔, split to → and ← .
+  split,
+  {
+    -- this is where the hint is needed, contrapose before simp
+    contrapose,
+    simp,
+  },
+  {
+    contrapose,
+    simp,
+  }
+end
+
+-- extra note, since the two split proofs above are the same, this above
+-- proof can be reduced to
+
+example (n : ℕ) : 0 < n ↔ n ≠ 0 :=
+begin
+  split;  -- here the ; means apply the following to both goals.
+  {
+    contrapose,
+    simp,
+  }
 end
