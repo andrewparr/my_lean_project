@@ -7,6 +7,7 @@
 
 import tactic data.nat.basic
 open nat
+open function
 
 /--------------------------------------------------------------------------
 
@@ -72,4 +73,68 @@ begin
   -- rw nat.sub_self d,
   rw nat.sub_self _, -- you don't actually need to reduce the a * b to d
   -- I'm not sure why I needed nat.sub_self. But just using rw sub_self didn't work. 
+end
+
+-- 3.1.1. Surjective functions
+
+--  Recall that a function f : X → Y is surjective if for every y : Y there exists a term x : X such that
+--  f(x) = y. In type theory, for every function f we can define a corresponding proposition
+--  surjective (f) := ∀ y, ∃ x, f x = y and a function being surjective is equivalent to saying
+--  that the proposition surjective(f) is inhabited.
+
+/--------------------------------------------------------------------------
+
+``unfold``
+
+  If it gets hard to keep track of the definition of ``surjective``,
+  you can use ``unfold surjective,`` or ``unfold surjective at h,``
+  to get rid of it.
+
+Delete the ``sorry,`` below and replace them with a legitimate proof.
+
+--------------------------------------------------------------------------/
+
+variables X Y Z : Type
+variables (f : X → Y) (g : Y → Z)
+
+/-
+surjective (f : X → Y) := ∀ y, ∃ x, f x = y
+-/
+
+example
+  (hf : surjective f)
+  (hg : surjective g)
+  : surjective (g ∘ f) :=
+begin
+  -- These unfolds aren't necessary, bu they help to see the proof.
+  unfold surjective,
+  unfold surjective at hf,
+  unfold surjective at hg,
+  -- our goal is ∀ (b : Z) .., so we can introduce an arbitary z.
+  intro z,
+  -- we can now use hg with this z, to give use a y : Y
+  -- we do this be creating the hypothesis that there must exist a y : Y
+  have h1 : ∃ y : Y, g y = z, from hg z,
+  -- and then uses cases on this hypothesis to obtain an arbitary y : Y
+  cases h1 with y,
+  -- similar as above, we now use hf with this y to first creat the hypothesis
+  -- that an x : X must exist
+  have h2 : ∃ x : X, f x = y, from hf y,
+  -- then use cases to obtiain an arbitary x : X
+  cases h2 with x,
+  -- finally our goal is in sight, the goal is to prove
+  -- ∃ (a : X), (g ∘ f) a = z
+  -- and we can just use the x : X that we have proved exists above.
+  use x,
+  -- the finish tatic will now finish this proof.
+  finish,
+  -- If you use suggest rather than finish above, it suggest the following to finish the proof.
+  -- exact (eq.congr_right h1_h).mp (congr_arg g (eq.symm h2_h)).symm,
+ end
+
+example
+  (hgf : surjective (g ∘ f))
+  : surjective g :=
+begin
+  sorry,
 end
