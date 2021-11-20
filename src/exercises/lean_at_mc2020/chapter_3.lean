@@ -136,43 +136,37 @@ example
   (hgf : surjective (g ∘ f))
   : surjective g :=
 begin
+  -- The following proof we'll use is
+  -- take any z ∈ Z,
+  -- since g ∘ f is surjective, ∃ x ∈ X, s.t. (g ∘ f) x = z,
+  -- so g(f(x)) = z,
+  -- set y = f(x) , note y ∈ Y.
+  -- then, g(b) = g(f(x)) = y
+  -- see https://www.youtube.com/watch?v=bTKOC3Rst8c
+  
+  -- Again these unfolds aren't required but they help.
   unfold surjective,
   unfold surjective at hgf,
+  -- take any z : Z
   intro z,
+  -- since g ∘ f is surjective, ∃ x ∈ X, s.t. (g ∘ f) x = z,
   have h1 : ∃ (a : X), (g ∘ f) a = z, from hgf z,
+  -- so (g ∘ f) x = z
   cases h1 with x h2,
   
-  --have y : Y, from f x,
-  have hh : ∃ (y : Y), y = f x :=
+  -- In order to set y = f x, we first prove that there exists a y : Y
+  have h2 : ∃ (y : Y), y = f x :=
   begin
     use f x,
   end,
-  cases hh with y,
+  -- this this we have our y.
+  cases h2 with y h3,
 
+  -- our proof is these exists, and y is the value to use.
   use y,
-  
-  
-
-  --induction h2,  
-  --have y : Y, from f x,
-  --use y,
-  --have hh : y = f x := begin
-  --  induction h2,
-  --end,
-  --use y,
-  
-  --have hh : f x - (y : Y), from f x, -- where is proof that y = f x
-  -- WHat is my proof here ?
-  sorry,
+  -- hint, tells use finish will finish the goal
+  --finish,
+  -- But this doesn't teach us anything, but a could of rewrites will close the goal.
+  rw ← h2,
+  rw h3,
 end
-
-/--
-
-Proof, take any z ∈ Z,
-since g ∘ f is surjective, ∃ x ∈ X, s.t. (g ∘ f) x = z,
-so g(f(x)) = z,
-set y = f(x) , note y ∈ Y.
-then, g(b) = g(f(x)) = y
-see https://www.youtube.com/watch?v=bTKOC3Rst8c
-
---/
