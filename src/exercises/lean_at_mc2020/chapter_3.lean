@@ -136,5 +136,43 @@ example
   (hgf : surjective (g ∘ f))
   : surjective g :=
 begin
+  unfold surjective,
+  unfold surjective at hgf,
+  intro z,
+  have h1 : ∃ (a : X), (g ∘ f) a = z, from hgf z,
+  cases h1 with x h2,
+  
+  --have y : Y, from f x,
+  have hh : ∃ (y : Y), y = f x :=
+  begin
+    use f x,
+  end,
+  cases hh with y,
+
+  use y,
+  
+  
+
+  --induction h2,  
+  --have y : Y, from f x,
+  --use y,
+  --have hh : y = f x := begin
+  --  induction h2,
+  --end,
+  --use y,
+  
+  --have hh : f x - (y : Y), from f x, -- where is proof that y = f x
+  -- WHat is my proof here ?
   sorry,
 end
+
+/--
+
+Proof, take any z ∈ Z,
+since g ∘ f is surjective, ∃ x ∈ X, s.t. (g ∘ f) x = z,
+so g(f(x)) = z,
+set y = f(x) , note y ∈ Y.
+then, g(b) = g(f(x)) = y
+see https://www.youtube.com/watch?v=bTKOC3Rst8c
+
+--/
