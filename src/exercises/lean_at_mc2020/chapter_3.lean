@@ -1,11 +1,11 @@
 -- 3. Infinitely Many Primes
 
 -- Today we will prove that there are infinitely many primes using mathlib library.
--- Our focus will be on how to use the library to prove more complicated theorems. 
+-- Our focus will be on how to use the library to prove more complicated theorems.
 
 -- 3.1. Equality
 
-import tactic data.nat.basic
+import tactic data.nat.basic data.nat.prime
 open nat
 open function
 
@@ -39,7 +39,7 @@ example (a b c d : ℕ)
 begin
   rw hyp,
   rw hyp',
-  ring,   
+  ring,
 end
 
 -- The above was solved, but comment above says to use mul_comm, so here's another go
@@ -68,11 +68,11 @@ begin
   rw hyp,
   rw hyp',
   -- goal is now b * a - a * b, so we can't yet apply rw sub_self
-  rw mul_comm, -- now have a * b - a * b, but 
+  rw mul_comm, -- now have a * b - a * b, but
   -- rw ← hyp', -- this replaces both sets of a * b to d
   -- rw nat.sub_self d,
   rw nat.sub_self _, -- you don't actually need to reduce the a * b to d
-  -- I'm not sure why I needed nat.sub_self. But just using rw sub_self didn't work. 
+  -- I'm not sure why I needed nat.sub_self. But just using rw sub_self didn't work.
 end
 
 -- 3.1.1. Surjective functions
@@ -143,7 +143,7 @@ begin
   -- set y = f(x) , note y ∈ Y.
   -- then, g(b) = g(f(x)) = y
   -- see https://www.youtube.com/watch?v=bTKOC3Rst8c
-  
+
   -- Again these unfolds aren't required but they help.
   unfold surjective,
   unfold surjective at hgf,
@@ -153,7 +153,7 @@ begin
   have h1 : ∃ (a : X), (g ∘ f) a = z, from hgf z,
   -- so (g ∘ f) x = z
   cases h1 with x h2,
-  
+
   -- In order to set y = f x, we first prove that there exists a y : Y
   have h2 : ∃ (y : Y), y = f x :=
   begin
@@ -166,7 +166,63 @@ begin
   use y,
   -- hint, tells use finish will finish the goal
   --finish,
-  -- But this doesn't teach us anything, but a could of rewrites will close the goal.
+  -- But this doesn't teach us anything. These two rewrites will close the goal.
   rw ← h2,
   rw h3,
+end
+
+-- 3.2. Creating subgoals
+/--------------------------------------------------------------------------
+
+Often when we write a long proof in math, we break it up into simpler problems. This is done in
+Lean using the have tactic.
+
+``have``
+
+  ``have hp : P,`` creates a new goal with target ``P`` and
+  adds ``hp : P`` as a hypothesis to the original goal.
+
+
+have is crucial for being able to use theorems from the library. To use these theorems you have to
+create terms that match the hypothesis exactly. Consider the following example. The type n > 0
+is not the same as 0 < n. If you need a term of type ``n > 0 `` and you only have ``hn : 0 < n``,
+then you can use ``have hn2 : n > 0, linarith,`` and you will have constructed a term hn2 of type n > 0.
+
+Warning: If you need to type the divisibility symbol, type \mid. This is not the vertical line
+on your keyboard.
+
+You'll need the following theorem from the library:
+
+nat.dvd_sub : n ≤ m → k ∣ m → k ∣ n → k ∣ m - n
+
+   (Note that you don't need to provide n m k as inputs to dvd_sub
+   Lean can infer these from the rest of the expression.
+   More on this tomorrow.)
+
+Delete the ``sorry,`` below and replace it with a legitimate proof.
+
+--------------------------------------------------------------------------/
+
+theorem dvd_sub_one {p a : ℕ} : (p ∣ a) → (p ∣ a + 1) → (p ∣ 1) :=
+begin
+  intro hpa, -- intro h : p ∣ a
+  intro hpap, -- intro h : p ∣ a + 1
+  have h : a < a + 1, linarith,
+  -- Our proof strategy is the to apply the proof
+  --    nat.dvd_sub : n ≤ m → k ∣ m → k ∣ n → k ∣ m - n
+  -- for this we have the follow
+  --     n = a
+  --     m = a + 1
+  --     k = p
+  -- so
+  -- nat.dvd_sub : a ≤ a + 1 → p ∣ a + 1 → p ∣ a → p ∣ a + 1 - a
+  -- Thus before we can apply this, we need to have these hypotheses
+  -- This is showing off the power of finish, but it teaches us less.
+  have h2 : p ∣ a + 1, by finish,
+  have h3 : p ∣ a, by finish,
+  have h3 : p ∣ a + 1 - a := begin
+    refine dvd_sub _ hpap hpa,
+    linarith,
+  end,
+  finish,
 end
