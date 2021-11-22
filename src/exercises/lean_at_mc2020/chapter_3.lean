@@ -205,9 +205,8 @@ Delete the ``sorry,`` below and replace it with a legitimate proof.
 
 theorem dvd_sub_one {p a : ℕ} : (p ∣ a) → (p ∣ a + 1) → (p ∣ 1) :=
 begin
-  intro hpa, -- intro h : p ∣ a
-  intro hpap, -- intro h : p ∣ a + 1
-  have h : a < a + 1, linarith,
+  intro h1, -- intro h1 : p ∣ a
+  intro h2, -- intro h2 : p ∣ a + 1
   -- Our proof strategy is the to apply the proof
   --    nat.dvd_sub : n ≤ m → k ∣ m → k ∣ n → k ∣ m - n
   -- for this we have the follow
@@ -217,12 +216,24 @@ begin
   -- so
   -- nat.dvd_sub : a ≤ a + 1 → p ∣ a + 1 → p ∣ a → p ∣ a + 1 - a
   -- Thus before we can apply this, we need to have these hypotheses
-  -- This is showing off the power of finish, but it teaches us less.
-  have h2 : p ∣ a + 1, by finish,
-  have h3 : p ∣ a, by finish,
+  --have h3 : p ∣ a + 1 - a := begin
   have h3 : p ∣ a + 1 - a := begin
-    refine dvd_sub _ hpap hpa,
+    refine dvd_sub _ h2 h1,
     linarith,
   end,
-  finish,
+  -- This is showing off the power of finish, but it teaches us less.
+  -- finish,
+  -- suggest gives the folowing one line proof, which tells us more but is not simple
+  -- exact (nat.dvd_add_right h1).mp h2,
+  -- A far more wordy way to prove it, but it teaches us much more.
+  -- First show that a + 1 - a = 1 which is easily prooved by norm_num
+  have h4 : a + 1 - a = 1, by norm_num,
+  -- rw this at h3 to give
+  -- h3 : p ∣ 1
+  rw h4 at h3,
+  -- our goal is h3, one of our assumptions and so we are done.
+  -- assumption,
+  -- exact h3 would also do and is possibly cleaner.
+  exact h3,
 end
+
