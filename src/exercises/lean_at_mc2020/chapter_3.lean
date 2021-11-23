@@ -1,13 +1,13 @@
+import tactic data.nat.basic data.nat.prime
+open nat
+open function
+
 -- 3. Infinitely Many Primes
 
 -- Today we will prove that there are infinitely many primes using mathlib library.
 -- Our focus will be on how to use the library to prove more complicated theorems.
 
 -- 3.1. Equality
-
-import tactic data.nat.basic data.nat.prime
-open nat
-open function
 
 /--------------------------------------------------------------------------
 
@@ -171,6 +171,8 @@ begin
   rw h3,
 end
 
+
+
 -- 3.2. Creating subgoals
 /--------------------------------------------------------------------------
 
@@ -237,3 +239,36 @@ begin
   exact h3,
 end
 
+-- 3.3. Infinitely many primes
+
+-- We’ll now prove that there are infinitely many primes. The strategy is to show that there is a
+-- prime greater than n, for every natural number n. We will choose this prime to be smallest
+-- non-trivial factor of n! + 1. We’ll need the following definitions and theorems from the library.
+
+-- From aobve, `dvd_sub_one : (p ∣ a) → (p ∣ a + 1) → (p ∣ 1)`
+
+-- Primes
+--        `m ∣ n := ∃ k : ℕ, m = n * k`
+--        `m.prime :=  2 ≤ p ∧ (∀ (m : ℕ), m ∣ p → m = 1 ∨ m = p)`
+--        `prime.not_dvd_one : (prime p) → ¬ p ∣ 1`
+
+-- Factorials
+--        `n.fact := n!  --n factorial`
+--        `fact_pos : ∀ (n : ℕ), 0 < n.fact`
+--        `dvd_fact : 0 < m → m ≤ n → m ∣ n.fact`
+
+-- Smallest factor
+--        `n.min_fac := smallest non-trivial factor of n`
+--        `min_fac_prime : n ≠ 1 → n.min_fac.prime`
+--        `min_fac_pos : ∀ (n : ℕ), 0 < n.min_fac`
+--        `min_fac_dvd : ∀ (n : ℕ), n.min_fac ∣ n`
+
+noncomputable theory
+open_locale classical
+
+theorem exists_infinite_primes (n : ℕ) : ∃ p, nat.prime p ∧ p ≥ n :=
+begin
+  -- This first line was given with no explanation.
+  set p:= (n.factorial + 1).min_fac,
+  sorry,
+end
