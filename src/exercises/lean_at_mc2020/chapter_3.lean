@@ -266,9 +266,43 @@ end
 noncomputable theory
 open_locale classical
 
-theorem exists_infinite_primes (n : ℕ) : ∃ p, nat.prime p ∧ p ≥ n :=
+theorem exists_infinite_primes (n : ℕ) : ∃ p, prime p ∧ p ≥ n :=
 begin
   -- This first line was given with no explanation.
   set p:= (n.factorial + 1).min_fac,
   sorry,
+end
+
+-- alternative proof : Ref: https://www.youtube.com/watch?v=b59fpAJ8Mfs
+theorem infinitude_of_primes : ∀ n, ∃ p ≥ n, prime p :=
+begin
+  -- this proof says something for all n : N, we let n be an arbitary ℕ
+  intro n,
+
+  let m := factorial n + 1,
+  let p := min_fac m,
+
+  have pp : prime p :=
+  begin
+    refine min_fac_prime _,
+    have h : factorial n > 0 := factorial_pos n,
+    linarith,
+  end,
+
+  use p,
+  split,
+  {
+    by_contradiction,
+    have h₁ : p ∣ factorial n + 1 := min_fac_dvd m,
+    have h₂ : p ∣ factorial n :=
+    begin
+      refine pp.dvd_factorial.mpr _,
+      exact le_of_not_ge h,
+    end,
+    have h : p ∣ 1 := dvd_sub_one h₂ h₁,
+    exact prime.not_dvd_one pp h,
+  },
+  {
+    exact pp,
+  }
 end
