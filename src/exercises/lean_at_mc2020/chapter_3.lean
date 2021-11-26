@@ -270,6 +270,30 @@ theorem exists_infinite_primes (n : ℕ) : ∃ p, prime p ∧ p ≥ n :=
 begin
   -- This first line was given with no explanation.
   set p:= (n.factorial + 1).min_fac,
+  -- however this is the p we need for our proof of existance
+  use p,
+  -- now have to prove prime p ∧ p ≥ n, so lets split this two goals.
+  split, {
+    -- goal is prime p
+    -- Now from above p is generated from n.min_fac
+    -- and we know from min_fac_prime that as long as n ≠ 1, n.min_fac is prime
+    apply min_fac_prime, -- goal now n.factorial + 1 ≠ 1
+    -- in lean ≠ are less easy to work with than =
+    rw ne.def, -- goal is now ¬ n.factorial + 1 = 1
+    rw add_left_eq_self,
+    -- goal is now ¬ n.factorial = 0
+    -- want somehow to get 0 < n.factorial
+    have h : 0 < n.factorial := begin
+      refine gt.lt _,
+      norm_num,
+      apply factorial_pos,
+    end,
+    linarith,
+  },
+  -- goal is p ≥ n
+  have h : p ≠ 1 := begin
+    sorry,
+  end,
   sorry,
 end
 

@@ -28,7 +28,11 @@ example : add two two = four := rfl
 
 -- We can't at this point write 2 + 2 because we haven't defined the infix notation of +
 
--- todo
+-- In lean we define the infix notation + to be number.add
+infix `+` := number.add
+
+-- and now we can write
+example : two + two = four := rfl
 
 -- end our namespace
 end number
