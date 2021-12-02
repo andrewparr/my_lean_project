@@ -248,7 +248,7 @@ end
 -- From aobve, `dvd_sub_one : (p ∣ a) → (p ∣ a + 1) → (p ∣ 1)`
 
 -- Primes
---        `m ∣ n := ∃ k : ℕ, m = n * k`
+--        `m ∣ n := ∃ k : ℕ, m * k = n`
 --        `m.prime :=  2 ≤ p ∧ (∀ (m : ℕ), m ∣ p → m = 1 ∨ m = p)`
 --        `prime.not_dvd_one : (prime p) → ¬ p ∣ 1`
 

@@ -95,12 +95,12 @@ The descriptions of the library theorems that you’ll be needing are included a
 /-
 prime.dvd_of_dvd_pow : ∀ {p m n : ℕ}, p.prime → p ∣ m ^ n → p ∣ m
 -/
-lemma two_dvd_of_two_dvd_sq {k : ℕ}
-  (hk : 2 ∣ k ^ 2)
-: 2 ∣ k :=
+lemma two_dvd_of_two_dvd_sq {k : ℕ} (hk : 2 ∣ k ^ 2) : 2 ∣ k :=
 begin
   apply prime.dvd_of_dvd_pow,
-  norm_num,
+  -- norm_num does most of the work here
+  -- { norm_num, },
+  { exact nat.prime_two }, -- alternatively the goal of prime 2 is already in mathlib
   exact hk,
 end
 
@@ -110,7 +110,18 @@ lemma division_lemma_n {m n : ℕ}
   (hmn : 2 * m ^ 2 = n ^ 2)
 : 2 ∣ n :=
 begin
-  sorry,
+  -- Here the goal is 2 | n and what we just proved above is that
+  -- given the hypothesis that 2 ∣ k^2 we have 2 ∣ k
+  -- so from our goal of 2 ∣ n, we apply this to get the goal of
+  -- 2 ∣ n^2
+  apply two_dvd_of_two_dvd_sq,
+  -- Here we have to remember that the division is defined as `m ∣ n := ∃ k : ℕ, m * k = n`
+  -- so our goal of 2 ∣ n^2 is to show the existance of a k such that 2 * k = n^2
+  -- out hypothesis tells us this is simply m^2
+  use m^2,
+  -- Goal is now the symmetry of hmn, so lets use the symmetry hint followed by exact.
+  symmetry,
+  exact hmn,
 end
 
 lemma div_2 {m n : ℕ} (hnm : 2 * m = 2 * n) : (m = n) :=
@@ -118,10 +129,17 @@ begin
   linarith,
 end
 
-lemma division_lemma_m {m n : ℕ}
-  (hmn : 2 * m ^ 2 = n ^ 2)
-: 2 ∣ m :=
+lemma division_lemma_m {m n : ℕ} (hmn : 2 * m ^ 2 = n ^ 2) : 2 ∣ m :=
 begin
   apply two_dvd_of_two_dvd_sq,
-  sorry,
+  -- goal is now 2 ∣ m^2 , which is is find k such that 2 * k = m^2
+  -- We need to use the division_lemma_n which will take a hypothesis of hmn
+  -- and produce a proof that 2 | n
+  have hn := division_lemma_n hmn, -- we now have hn : 2 ∣ n
+  -- since 2 ∣ n, n must be some multiple of 2
+  cases hn with k hk,
+  -- this give hk : n = 2 * k
+  -- we now know ...?
+
 end
+
