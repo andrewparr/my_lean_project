@@ -136,10 +136,23 @@ begin
   -- We need to use the division_lemma_n which will take a hypothesis of hmn
   -- and produce a proof that 2 | n
   have hn := division_lemma_n hmn, -- we now have hn : 2 ∣ n
-  -- since 2 ∣ n, n must be some multiple of 2
+  -- since 2 ∣ n, n must be some multiple of 2 and so performing cases...
   cases hn with k hk,
-  -- this give hk : n = 2 * k
-  -- we now know ...?
-
+  -- gives hk : n = 2 * k
+  -- we now know ...n = 2k, and 2m^2 = n^2 = (2k)^2 = 4 * k^2
+  -- and so m^2 = 2 * k^2 and so the k we want is k^2
+  use k^2,
+  -- goal is now m^2 = 2 * k^2
+  -- we can't proove this directly
+  -- but we have
+  --   hmn : 2 * m^2 = n^2
+  --   hk  : n = 2 * k
+  -- and so
+  rw hk at hmn,
+  -- gives, hmn : 2 * m^2 = (2*k)^2
+  -- which linarith can solve
+  linarith,
 end
+
+
 
