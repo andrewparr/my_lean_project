@@ -154,5 +154,97 @@ begin
   linarith,
 end
 
+-- 4.3.2. Prove (*) assuming m and n are coprime.
+
+/-
+theorem nat.not_coprime_of_dvd_of_dvd  : 1 < d → d ∣ m → d ∣ n → ¬m.coprime n
+-/
+
+theorem sqrt2_irrational' :
+  ¬ ∃ (m n : ℕ),
+  2 * m^2 = n^2 ∧
+  m.coprime n
+:=
+begin
+  -- goal is ¬∃ (m n : ℕ), 2 * m ^ 2 = n ^ 2 ∧ m.coprime n
+  by_contradiction,
+  -- now have h : ∃ (m n : ℕ), 2 * m ^ 2 = n ^ 2 ∧ m.coprime n
+  -- and goal is false
+  -- rcases on this h gives
+  --    m n : ℕ
+  --   hmn : 2 * m ^ 2 = n ^ 2
+  --   h_cop : m.coprime n
+  rcases h with ⟨m, n, hmn, h_cop⟩,
+  -- rcases is a way of doing cases iteratively
+  -- you get the brackets by typing ``\langle`` and ``\rangle``
+  -- We need to use the proofs above
+  -- using the have syntax we're given above
+  -- first, the division algorithm gives us  2 ∣ m
+  have h_m_even : 2 ∣ m := division_lemma_m(hmn),
+  -- we have h_cop : m.coprime m
+  -- to apply the not_coprime_of_dvd_of_dvd above we want ¬ m.coprime
+  -- so lets use contrapose on it
+  contrapose h_cop,
+  -- goal is now ¬m.coprime n and so
+  -- we can now apply not_coprime_of_dvd_of_dvd
+  apply not_coprime_of_dvd_of_dvd,
+  -- we now have a number of goals all the ones to the left of the of the ¬m.coprime n in
+  -- the definition of theorem nat.not_coprime_of_dvd_of_dvd
+  -- so these are 1 < d → d ∣ m → d ∣ n
+  {
+    -- here the goal is 1 < d, but actually we have 2 ∣ m and so d is 2
+    -- the goal is written as 1 < ?m_1
+    -- but it's actually 2 or 1+1 and this is
+    exact lt_add_one 1,
+  },
+  {
+    -- goal here is 1 + 1 | m, and this is
+    exact h_m_even,
+  },
+  {
+    -- goal here is 1 + 1 ∣ n, this is exactly the division_lemma_m just proved on hmn
+    exact division_lemma_n hmn,
+  }
+end
 
 
+-- alternatively
+theorem sqrt2_irrational'' :
+  ¬ ∃ (m n : ℕ),
+  2 * m^2 = n^2 ∧
+  m.coprime n
+:=
+begin
+  -- goal is ¬∃ (m n : ℕ), 2 * m ^ 2 = n ^ 2 ∧ m.coprime n
+  by_contradiction,
+  -- now have h : ∃ (m n : ℕ), 2 * m ^ 2 = n ^ 2 ∧ m.coprime n
+  -- and goal is false
+  -- rcases on this h gives
+  --    m n : ℕ
+  --   hmn : 2 * m ^ 2 = n ^ 2
+  --   h_cop : m.coprime n
+  rcases h with ⟨m, n, hmn, h_cop⟩,
+  -- rcases is a way of doing cases iteratively
+  -- you get the brackets by typing ``\langle`` and ``\rangle``
+  -- We need to use the proofs above
+  -- using the have syntax we're given above
+  -- first, the division_lemma_m gives us  2 ∣ m
+  have h_m_even : 2 ∣ m := division_lemma_m(hmn),
+  -- secondly, the division_lemma_n gives us 2 ∣ n
+  have h_n_even : 2 ∣ n := division_lemma_n(hmn),
+  -- we have h_cop : m.coprime m
+  -- to apply the not_coprime_of_dvd_of_dvd above we want ¬ m.coprime
+  -- so lets use contrapose on it
+  contrapose h_cop,
+  -- goal is now ¬m.coprime n and so
+  -- we can now apply not_coprime_of_dvd_of_dvd
+  apply not_coprime_of_dvd_of_dvd,
+  -- we now have a number of goals all the ones to the left of the of the ¬m.coprime n in
+  -- the definition of theorem nat.not_coprime_of_dvd_of_dvd
+  -- so these are 1 < d → d ∣ m → d ∣ n
+  exact lt_add_one 1,
+  exact h_m_even,
+  exact h_n_even,
+end
+
+-- 4.3.3. Lemmas for proving (*) assuming m ≠ 0
