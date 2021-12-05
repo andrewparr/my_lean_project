@@ -248,3 +248,49 @@ begin
 end
 
 -- 4.3.3. Lemmas for proving (*) assuming m ≠ 0
+
+lemma ne_zero_ge_zero {n : ℕ} (hne : n ≠ 0) : (0 < n) :=
+begin
+  -- this following line is given in mc2020 notes
+  contrapose! hne,
+  -- linarith then closes the goal
+  --linarith,
+  -- but a library_search finds the exact mathlib proof.
+  exact le_zero_iff.mp hne,
+end
+
+/-
+nat.pow_pos : ∀ {p : ℕ}, 0 < p → ∀ (n : ℕ), 0 < p ^ n
+-/
+lemma ge_zero_sq_ge_zero {n : ℕ} (hne : 0 < n) : (0 < n^2)
+:=
+begin
+  -- again library_search is useful here to find the exact proof in mathlib
+  -- exact pow_pos hne 2,
+  -- for a more manual process.
+  cases n, -- n is either 0 or n.succ for some other n
+  {
+    -- if n is zero
+    rw zero_pow,
+    exact hne,
+    exact zero_lt_two,
+  },
+  {
+    -- if n is n.succ for some other n
+    rw pow_succ,
+    rw pow_one;
+    exact mul_pos hne hne,
+  }
+end
+
+lemma cancellation_lemma {k m n : ℕ} (hk_pos : 0 < k^2) (hmn : 2 * (m * k) ^ 2 = (n * k) ^ 2) : 2 * m ^ 2 = n ^ 2 :=
+begin
+  -- this following line is given in the mc2020 notes.
+  apply (nat.mul_left_inj hk_pos).mp,
+  -- mc2020 notes also give the following two lines, but these fail to prove this lemma
+  --ring at *,
+  --exact hmn,
+  -- however linarith is sufficient.
+  linarith,
+end
+
