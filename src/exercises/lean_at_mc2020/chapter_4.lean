@@ -160,11 +160,7 @@ end
 theorem nat.not_coprime_of_dvd_of_dvd  : 1 < d → d ∣ m → d ∣ n → ¬m.coprime n
 -/
 
-theorem sqrt2_irrational' :
-  ¬ ∃ (m n : ℕ),
-  2 * m^2 = n^2 ∧
-  m.coprime n
-:=
+theorem sqrt2_irrational' : ¬ ∃ (m n : ℕ), 2 * m^2 = n^2 ∧ m.coprime n :=
 begin
   -- goal is ¬∃ (m n : ℕ), 2 * m ^ 2 = n ^ 2 ∧ m.coprime n
   by_contradiction,
@@ -209,11 +205,7 @@ end
 
 
 -- alternatively
-theorem sqrt2_irrational'' :
-  ¬ ∃ (m n : ℕ),
-  2 * m^2 = n^2 ∧
-  m.coprime n
-:=
+example : ¬ ∃ (m n : ℕ), 2 * m^2 = n^2 ∧ m.coprime n :=
 begin
   -- goal is ¬∃ (m n : ℕ), 2 * m ^ 2 = n ^ 2 ∧ m.coprime n
   by_contradiction,
@@ -294,3 +286,42 @@ begin
   linarith,
 end
 
+-- 4.3.4. Prove (*) assuming m ≠ 0
+
+/-
+gcd_pos_of_pos_left : ∀ {m : ℕ} (n : ℕ), 0 < m → 0 < m.gcd n
+gcd_pos_of_pos_right : ∀ (m : ℕ) {n : ℕ}, 0 < n → 0 < m.gcd n
+exists_coprime : ∀ {m n : ℕ}, 0 < m.gcd n → (∃ (m' n' : ℕ), m'.coprime n' ∧ m = m' * m.gcd n ∧ n = n' * m.gcd n)
+-/
+theorem wlog_coprime : (∃ (m n : ℕ), 2 * m^2 = n^2 ∧ m ≠ 0 ) → (∃ (m' n' : ℕ), 2 * m'^2 = n'^2 ∧ m'.coprime n' ) :=
+begin
+  intro key,
+  rcases key with ⟨m, n, hmn, hme0⟩,
+  set k := m.gcd n with hk,
+  -- might be useful to declutter
+  -- you can replace all the ``m.gcd n`` with ``k`` using ``rw ←hk,`` if needed
+  -- The lines above this one are given in the mc2020 notes.
+  -- proof is an and, so lets split it first
+  split,
+  -- goal is to find n' : ℕ, such that 2 * m_1^2 = n'^2 and n.coprime n'
+  -- k is the gcd of m and n, so use n'k
+  use n/k,
+  split,
+  {
+    rw cancellation_lemma,
+    refine gt.lt _, assumption,
+    refine pow_pos _ 2,
+    sorry,
+    sorry,
+  },
+
+  sorry,
+  sorry,
+
+end
+
+
+theorem sqrt2_irrational'' : ¬ ∃ (m n : ℕ), 2 * m^2 = n^2 ∧ m ≠ 0 :=
+begin
+  sorry,
+end
