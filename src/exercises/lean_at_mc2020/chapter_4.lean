@@ -301,23 +301,24 @@ begin
   -- might be useful to declutter
   -- you can replace all the ``m.gcd n`` with ``k`` using ``rw ←hk,`` if needed
   -- The lines above this one are given in the mc2020 notes.
-  -- proof is an and, so lets split it first
+  have hmge : 0 < m := by exact ne.bot_lt hme0,
+  have hge : 0 < m.gcd n := by exact pos_of_dvd_of_pos (gcd_dvd_left m n) hmge,
+  have he := exists_coprime(hge),
+  cases he,
+  set m' := m / k,
+  set n' := n / k;
+  cases he_h with h1 h2,
+  use (he_w * k),
+  use (h1 * k),
+  cases h2 with h2_1 h2_2,
+  rw ← hk at h2_2,
+  rw h2_2.1 at hmn,
+  rw h2_2.2 at hmn,
   split,
-  -- goal is to find n' : ℕ, such that 2 * m_1^2 = n'^2 and n.coprime n'
-  -- k is the gcd of m and n, so use n'k
-  use n/k,
-  split,
-  {
-    rw cancellation_lemma,
-    refine gt.lt _, assumption,
-    refine pow_pos _ 2,
-    sorry,
-    sorry,
-  },
-
-  sorry,
-  sorry,
-
+  exact hmn,
+  -- need to prove  (he_w * k).coprime (h1 * k)
+  -- this can't be right (he_w * k) is coprime with (h1 * k) only if k is one
+  repeat {sorry},
 end
 
 
